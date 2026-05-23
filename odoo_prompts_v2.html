@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Odoo BDR · Prompt Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#F7F5F0;color:#2E2B2A;min-height:100vh;}
+button{font-family:inherit;cursor:pointer;}
+input,textarea{font-family:inherit;}
+textarea{resize:vertical;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#D4C8C0;border-radius:3px;}
+.header{background:#fff;border-bottom:1px solid #E8E3DF;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 #E8E3DF;}
+.logo-area{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:34px;height:34px;background:#714B67;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:17px;}
+.logo-title{font-weight:700;font-size:14.5px;color:#2E2B2A;line-height:1.2;}
+.logo-sub{font-size:10.5px;color:#9B8F8A;margin-top:1px;}
+.lang-toggle{display:flex;background:#EDE9E4;border-radius:8px;padding:3px;gap:2px;}
+.lang-btn{padding:4px 13px;border-radius:6px;border:none;font-weight:700;font-size:11.5px;transition:all .15s;}
+.lang-btn.active{background:#fff;color:#714B67;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.lang-btn.inactive{background:transparent;color:#9B8F8A;}
+.layout{display:flex;height:calc(100vh - 58px);}
+.sidebar{width:230px;background:#fff;border-right:1px solid #E8E3DF;padding:18px 14px;flex-shrink:0;overflow-y:auto;}
+.filter-section{margin-bottom:22px;}
+.filter-label{font-size:9.5px;font-weight:800;color:#9B8F8A;text-transform:uppercase;letter-spacing:.09em;margin-bottom:9px;}
+.filter-btn{width:100%;text-align:left;padding:7px 10px;border-radius:8px;border:1.5px solid transparent;font-size:12.5px;font-weight:500;transition:all .12s;display:flex;align-items:center;gap:8px;margin-bottom:3px;background:transparent;}
+.filter-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.clear-btn{margin-top:4px;padding:2px 10px;font-size:10.5px;color:#9B8F8A;background:none;border:none;text-decoration:underline;cursor:pointer;}
+.tone-info{margin-top:9px;padding:8px 10px;background:#FFF8F0;border-radius:8px;font-size:10.5px;color:#92400E;line-height:1.45;}
+.main{flex:1;padding:20px 24px;overflow-y:auto;}
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;color:#9B8F8A;}
+.search-input{width:100%;padding:9px 13px 9px 38px;border-radius:10px;border:1.5px solid #E8E3DF;background:#fff;font-size:13.5px;color:#2E2B2A;outline:none;transition:border-color .15s;}
+.search-input:focus{border-color:#714B67;}
+.results-bar{font-size:11.5px;color:#9B8F8A;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.reset-btn{color:#714B67;background:none;border:none;font-size:11.5px;font-weight:700;text-decoration:underline;cursor:pointer;}
+.cards{display:flex;flex-direction:column;gap:10px;max-width:820px;}
+.card{background:#fff;border-radius:12px;border:1.5px solid #E8E3DF;overflow:hidden;transition:border-color .15s,box-shadow .15s;}
+.card.expanded{border-color:#714B6740;box-shadow:0 4px 18px #714B6712;}
+.card-header{padding:15px 18px;}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+.card-info{flex:1;}
+.badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.badge{padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;}
+.badge-type{background:#F1F5F9;color:#475569;}
+.card-title{font-weight:700;font-size:14.5px;color:#2E2B2A;margin-bottom:3px;}
+.card-desc{font-size:12.5px;color:#7A7570;}
+.var-hint{font-size:10.5px;color:#9B8F8A;margin-top:7px;}
+.card-actions{display:flex;gap:7px;flex-shrink:0;align-items:flex-start;}
+.btn-customize{padding:6px 13px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid #E8E3DF;background:#fff;color:#7A7570;transition:all .15s;white-space:nowrap;}
+.btn-customize.active{border-color:#714B6750;background:#f3ecf0;color:#714B67;}
+.btn-copy{padding:6px 13px;border-radius:8px;font-size:11.5px;font-weight:700;border:none;background:#714B67;color:#fff;transition:all .15s;white-space:nowrap;}
+.btn-copy.copied{background:#10B981;}
+.card-body{border-top:1px solid #E8E3DF;padding:15px 18px;background:#FAFAF8;}
+.section-label{font-size:9.5px;font-weight:800;color:#9B8F8A;text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;}
+.vars-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+.var-item{display:flex;flex-direction:column;gap:4px;}
+.var-item.full{grid-column:1/-1;}
+.var-field-label{font-size:10.5px;font-weight:700;color:#714B67;}
+.var-input{width:100%;padding:7px 10px;border-radius:7px;border:1.5px solid #E8E3DF;background:#fff;font-size:12.5px;color:#2E2B2A;outline:none;transition:border-color .15s;}
+.var-input:focus,.var-input.filled{border-color:#714B6740;}
+.var-input[type="date"]{padding:6px 10px;}
+.prompt-preview{background:#fff;border:1px solid #E8E3DF;border-radius:9px;padding:12px 14px;font-size:12px;line-height:1.7;color:#2E2B2A;white-space:pre-wrap;max-height:260px;overflow-y:auto;}
+.var-unfilled{background:#f3ecf0;color:#714B67;padding:1px 5px;border-radius:4px;font-weight:700;font-size:.9em;}
+.var-filled{background:#e8f5e9;color:#2e7d32;padding:1px 5px;border-radius:4px;font-weight:700;}
+.tone-notice{margin-top:7px;padding:6px 10px;background:#FFFBEB;border-radius:7px;font-size:10.5px;color:#92400E;}
+.empty{text-align:center;padding:60px 20px;color:#9B8F8A;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-title{font-weight:700;font-size:14px;margin-bottom:4px;color:#2E2B2A;}
+.empty-sub{font-size:12px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SC={territory:{bg:"#F3F4F6",tx:"#6B7280",bd:"#D1D5DB"},qualified:{bg:"#EFF6FF",tx:"#2563EB",bd:"#BFDBFE"},qualified_sponsor:{bg:"#F5F3FF",tx:"#7C3AED",bd:"#DDD6FE"},proposition:{bg:"#FFFBEB",tx:"#B45309",bd:"#FDE68A"},negociation:{bg:"#FEF2F2",tx:"#DC2626",bd:"#FECACA"}};
+const STAGES=[{id:"territory",fr:"Territory",en:"Territory"},{id:"qualified",fr:"Qualified",en:"Qualified"},{id:"qualified_sponsor",fr:"Qualified Sponsor",en:"Qualified Sponsor"},{id:"proposition",fr:"Proposition",en:"Proposition"},{id:"negociation",fr:"Négociation",en:"Negotiation"}];
+const TYPES=[{id:"preparation",fr:"Préparation",en:"Preparation",icon:"🔍"},{id:"mail",fr:"Mail",en:"Email",icon:"✉️"},{id:"resume",fr:"Résumé call",en:"Call Summary",icon:"📋"},{id:"visio",fr:"Visio / Démo",en:"Visio / Demo",icon:"🎥"}];
+const TONES=[{id:"professional",fr:"Professionnel",en:"Professional"},{id:"neutral",fr:"Neutre",en:"Neutral"},{id:"casual",fr:"Décontracté",en:"Casual"}];
+const TS={fr:{professional:"\n\n⚠️ Ton : adopte un ton professionnel et formel.",neutral:"",casual:"\n\n⚠️ Ton : adopte un ton décontracté et direct, tout en restant professionnel."},en:{professional:"\n\n⚠️ Tone: use a professional and formal tone.",neutral:"",casual:"\n\n⚠️ Tone: use a casual and direct tone while remaining professional."}};
+const DATE_VARS=new Set(["DATE_VALIDITE","DATE_DEMO"]);
+const LONG=new Set(["TRANSCRIPTION","TRANSCRIPT","CONTEXTE_OU_MAIL","CONTEXT_OR_EMAIL","PAIN_POINTS","POINTS_ABORDES","POINTS_DISCUSSED","NOTES_OU_TRANSCRIPTION","NOTES_OR_TRANSCRIPT","OBJECTION","DETAILS_OFFRE","OFFER_DETAILS","INFOS_DISPONIBLES","AVAILABLE_INFO","INFOS_MANQUANTES","MISSING_INFO","POINTS_FORTS","HIGHLIGHTS","DETAILS_DEVIS","QUOTE_DETAILS","ELEMENTS_ALIGNES","ALIGNED_ELEMENTS","SITUATION"]);
+const VL={URL_SITE:{fr:"URL du site web",en:"Website URL"},WEBSITE_URL:{fr:"URL du site web",en:"Website URL"},RÉGION:{fr:"Région",en:"Region"},REGION:{fr:"Region",en:"Region"},NOM_CLIENT:{fr:"Nom du contact",en:"Contact name"},CLIENT_NAME:{fr:"Contact name",en:"Contact name"},SECTEUR:{fr:"Secteur d'activité",en:"Business sector"},SECTOR:{fr:"Business sector",en:"Business sector"},CONTEXTE_OU_MAIL:{fr:"Contexte ou mail à répondre",en:"Context or email to reply"},CONTEXT_OR_EMAIL:{fr:"Context or email",en:"Context or email"},TRANSCRIPTION:{fr:"Transcription du call",en:"Call transcript"},TRANSCRIPT:{fr:"Call transcript",en:"Call transcript"},MODULES:{fr:"Modules Odoo identifiés",en:"Identified Odoo modules"},NOMBRE_UTILISATEURS:{fr:"Nombre d'utilisateurs",en:"Number of users"},NUMBER_OF_USERS:{fr:"Number of users",en:"Number of users"},PAIN_POINTS:{fr:"Pain points identifiés",en:"Identified pain points"},LOGICIEL_ACTUEL:{fr:"Logiciel actuel",en:"Current software"},CURRENT_SOFTWARE:{fr:"Current software",en:"Current software"},ENTREPRISE:{fr:"Nom de l'entreprise",en:"Company name"},COMPANY:{fr:"Company name",en:"Company name"},DATE:{fr:"Date du call",en:"Call date"},POINTS_ABORDES:{fr:"Points abordés",en:"Points discussed"},POINTS_DISCUSSED:{fr:"Points discussed",en:"Points discussed"},NEXT_STEP:{fr:"Prochaine étape",en:"Next step"},NOTES_OU_TRANSCRIPTION:{fr:"Notes ou transcription",en:"Notes or transcript"},NOTES_OR_TRANSCRIPT:{fr:"Notes or transcript",en:"Notes or transcript"},PLAN:{fr:"Plan Odoo",en:"Odoo plan"},UTILISATEURS:{fr:"Nombre d'utilisateurs",en:"Number of users"},USERS:{fr:"Number of users",en:"Number of users"},OBJECTION:{fr:"Objection exprimée",en:"Objection expressed"},DETAILS_OFFRE:{fr:"Détails de l'offre",en:"Offer details"},OFFER_DETAILS:{fr:"Offer details",en:"Offer details"},CONCURRENT:{fr:"Concurrent mentionné",en:"Competitor mentioned"},COMPETITOR:{fr:"Competitor",en:"Competitor"},DATE_DEMO:{fr:"Date et heure de la démonstration",en:"Demo date and time"},LIEN_VISIO:{fr:"Lien de connexion visio",en:"Video call link"},INFOS_DISPONIBLES:{fr:"Infos disponibles sur l'entreprise",en:"Available company info"},AVAILABLE_INFO:{fr:"Available company info",en:"Available company info"},INFOS_MANQUANTES:{fr:"Informations manquantes",en:"Missing information"},MISSING_INFO:{fr:"Missing information",en:"Missing information"},POINTS_FORTS:{fr:"Points forts / ce qui a intéressé le client",en:"Highlights / what interested the client"},HIGHLIGHTS:{fr:"Highlights",en:"Highlights"},DETAILS_DEVIS:{fr:"Détails des devis envoyés",en:"Details of quotes sent"},QUOTE_DETAILS:{fr:"Quote details",en:"Quote details"},DATE_VALIDITE:{fr:"Date de validité des devis",en:"Quote expiry date"},SITUATION:{fr:"Situation actuelle du prospect",en:"Current prospect situation"},DATE_ENVOI:{fr:"Date d'envoi des devis",en:"Date quotes were sent"},SEND_DATE:{fr:"Date d'envoi",en:"Send date"},ELEMENTS_ALIGNES:{fr:"Éléments alignés / accords conclus",en:"Aligned elements / agreements reached"},ALIGNED_ELEMENTS:{fr:"Aligned elements",en:"Aligned elements"}};
+
+const PROMPTS=[
+{id:1,stages:["territory","qualified"],type:"preparation",
+fr:{title:"Recherche entreprise",description:"Analyse rapide d'une entreprise avant un call",
+prompt:`Sur base du site web suivant : [URL_SITE]
+
+Fais-moi une analyse concise de cette entreprise :
+- Activité principale et secteur d'activité
+- Taille estimée (si visible)
+- Produits ou services clés
+- Problèmes métier typiques de ce secteur qu'Odoo pourrait résoudre
+
+Sois factuel et concis. N'invente aucune information.`},
+en:{title:"Company research",description:"Quick company analysis before a call",
+prompt:`Based on the following website: [WEBSITE_URL]
+
+Give me a concise analysis of this company:
+- Main activity and business sector
+- Estimated size (if visible)
+- Key products or services
+- Typical business problems in this sector that Odoo could solve
+
+Be factual and concise. Do not invent any information.`}},
+
+{id:2,stages:["territory","qualified","qualified_sponsor","proposition","negociation"],type:"mail",
+fr:{title:"Assistant rédaction mail",description:"Contexte complet pour créer ou répondre à un mail client",
+prompt:`Dans cette conversation, tu vas m'aider à créer ou répondre à des mails professionnels dans mon rôle de Business Development Representative chez Odoo.
+
+Contexte :
+- Je vends Odoo, un ERP modulaire (comptabilité, ventes, stock, CRM, manufacturing, RH, etc.)
+- Mes prospects sont des PME de la région [RÉGION]
+- Le contact s'appelle [NOM_CLIENT] et travaille dans le secteur [SECTEUR]
+
+Voici le contexte ou le mail auquel je dois répondre :
+[CONTEXTE_OU_MAIL]
+
+Rédige un mail professionnel, concis, orienté vers l'action.`},
+en:{title:"Email writing assistant",description:"Full context to create or reply to a client email",
+prompt:`In this conversation, you will help me create or reply to professional emails in my role as Business Development Representative at Odoo.
+
+Context:
+- I sell Odoo, a modular ERP (accounting, sales, inventory, CRM, manufacturing, HR, etc.)
+- My prospects are SMEs in the [REGION] area
+- The contact is [CLIENT_NAME] working in the [SECTOR] sector
+
+Here is the context or email I need to reply to:
+[CONTEXT_OR_EMAIL]
+
+Write a professional, concise, action-oriented email.`}},
+
+{id:3,stages:["qualified"],type:"resume",
+fr:{title:"Résumé post-qualification",description:"Extraction des infos clés depuis une transcription de call",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je viens de terminer un rendez-vous de qualification avec un prospect. Mon but est d'extraire les informations clés de la transcription pour structurer mon dossier client et préparer une démonstration personnalisée.
+
+Sur base de la transcription du call de qualification ci-dessous, résume-moi les informations suivantes :
+
+- Nombre d'utilisateurs potentiel
+- Budget (si mentionné)
+- Timeline (si mentionnée)
+- Prochaines étapes convenues
+- Qualification précise : flux de travail détaillé de l'entreprise et apps Odoo potentiellement intéressantes
+- Points d'attention spécifiques : développements custom évoqués, volumes de données à importer, intégrations avec d'autres outils, contraintes techniques ou organisationnelles
+- Scénario de démonstration suggéré : sur base des besoins identifiés, propose un ordre logique des modules à montrer avec une justification courte pour chacun
+- Recommandation de plan Odoo (Standard / Custom / Odoo.sh) : uniquement si le client n'a pas déjà été orienté vers un plan pendant le call — justifie brièvement ton choix
+
+Important : n'invente aucune information. Si une donnée est absente de la transcription, indique "Non mentionné".
+
+Voici la transcription :
+[TRANSCRIPTION]`},
+en:{title:"Post-qualification summary",description:"Key info extraction from a call transcript",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I have just completed a qualification meeting with a prospect. My goal is to extract key information from the transcript to structure my client file and prepare a personalized demonstration.
+
+Based on the qualification call transcript below, summarize the following information:
+
+- Potential number of users
+- Budget (if mentioned)
+- Timeline (if mentioned)
+- Agreed next steps
+- Precise qualification: detailed company workflows and potentially interesting Odoo apps
+- Specific points of attention: custom developments mentioned, data volumes to import, integrations with other tools, technical or organizational constraints
+- Suggested demo scenario: based on identified needs, propose a logical order of modules to show with a brief justification for each
+- Odoo plan recommendation (Standard / Custom / Odoo.sh): only if the client has not already been directed toward a plan during the call — briefly justify your choice
+
+Important: do not invent any information. If data is absent from the transcript, indicate "Not mentioned".
+
+Here is the transcript:
+[TRANSCRIPT]`}},
+
+{id:4,stages:["qualified_sponsor"],type:"visio",
+fr:{title:"Préparation démonstration",description:"Plan de démo personnalisé sur base du profil client",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je m'apprête à réaliser une démonstration Odoo pour un prospect qualifié. Mon but est de préparer un scénario de démo personnalisé et percutant sur base des informations collectées en qualification.
+
+Voici le contexte issu de la qualification :
+
+- Entreprise : [NOM_CLIENT]
+- Secteur : [SECTEUR]
+- Nombre d'utilisateurs : [NOMBRE_UTILISATEURS]
+- Modules d'intérêt identifiés : [MODULES]
+- Pain points identifiés : [PAIN_POINTS]
+- Logiciel actuel : [LOGICIEL_ACTUEL]
+
+Génère-moi :
+1. Un scénario de démo logique (ordre des modules avec justification courte)
+2. Les 3 moments "wow" à mettre en avant pour ce profil
+3. 5 questions à poser pendant la démo pour maintenir l'engagement
+4. Les objections probables et comment les gérer`},
+en:{title:"Demo preparation",description:"Personalized demo plan based on client profile",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I am about to deliver an Odoo demonstration to a qualified prospect. My goal is to prepare a personalized and impactful demo scenario based on information gathered during qualification.
+
+Here is the context from the qualification:
+
+- Company: [CLIENT_NAME]
+- Sector: [SECTOR]
+- Number of users: [NUMBER_OF_USERS]
+- Modules of interest identified: [MODULES]
+- Pain points identified: [PAIN_POINTS]
+- Current software: [CURRENT_SOFTWARE]
+
+Generate:
+1. A logical demo scenario (module order with brief justification)
+2. The 3 "wow" moments to highlight for this profile
+3. 5 questions to ask during the demo to maintain engagement
+4. Likely objections and how to handle them`}},
+
+{id:5,stages:["qualified","qualified_sponsor"],type:"mail",
+fr:{title:"Mail suivi post-qualification",description:"Mail récapitulatif après la qualification + confirmation démo",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je viens de terminer un rendez-vous de qualification avec un prospect. Mon but est de lui envoyer un mail de suivi professionnel qui récapitule nos échanges et confirme la date de la démonstration.
+
+Voici le contexte :
+
+- Contact : [NOM_CLIENT] ([ENTREPRISE])
+- Date du call : [DATE]
+- Points abordés : [POINTS_ABORDES]
+- Modules identifiés : [MODULES]
+- Date et heure de la démonstration : [DATE_DEMO]
+- Lien de connexion visio : [LIEN_VISIO]
+
+Le mail doit :
+- Remercier brièvement pour le temps accordé
+- Récapituler les points clés discutés
+- Confirmer la date et l'heure de la démonstration avec le lien de connexion
+- Rester concis (150 mots maximum)`},
+en:{title:"Post-qualification follow-up",description:"Summary email after qualification + demo confirmation",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I have just completed a qualification meeting with a prospect. My goal is to send them a professional follow-up email recapping our discussion and confirming the demo date.
+
+Here is the context:
+
+- Contact: [CLIENT_NAME] ([COMPANY])
+- Call date: [DATE]
+- Points discussed: [POINTS_DISCUSSED]
+- Identified modules: [MODULES]
+- Demo date and time: [DATE_DEMO]
+- Video call link: [LIEN_VISIO]
+
+The email should:
+- Briefly thank them for their time
+- Recap the key points discussed
+- Confirm the demo date and time with the connection link
+- Stay concise (150 words maximum)`}},
+
+{id:6,stages:["qualified_sponsor","proposition"],type:"resume",
+fr:{title:"Résumé post-démonstration",description:"Analyse des retours et next steps après une démo",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je viens de terminer une démonstration Odoo avec un prospect. Mon but est d'extraire les informations clés pour structurer la suite du dossier et préparer ma proposition commerciale.
+
+Sur base de mes notes ou de la transcription de la démo ci-dessous, résume-moi :
+
+- Les réactions positives du client (ce qui a le plus intéressé)
+- Les objections ou réserves exprimées
+- Les fonctionnalités demandées ou à vérifier
+- Le niveau décisionnel des personnes présentes (décideur identifié, influenceur, utilisateur final) — si cette info est présente dans la transcription
+- Budget évoqué pendant la démo — si mentionné
+- Le niveau de maturité d'achat estimé (chaud / tiède / froid) et pourquoi
+- Les prochaines étapes impératives
+
+Important : n'invente aucune information. Si une donnée est absente, indique "Non mentionné".
+
+Voici les notes / la transcription :
+[NOTES_OU_TRANSCRIPTION]`},
+en:{title:"Post-demo summary",description:"Feedback analysis and next steps after a demo",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I have just completed an Odoo demonstration with a prospect. My goal is to extract key information to structure the next steps and prepare my commercial proposal.
+
+Based on my notes or the demo transcript below, summarize:
+
+- Positive client reactions (what interested them most)
+- Objections or reservations expressed
+- Features requested or to verify
+- Decision-making level of people present (decision-maker identified, influencer, end user) — if this info is in the transcript
+- Budget mentioned during the demo — if mentioned
+- Estimated purchase readiness (hot / warm / cold) and why
+- Mandatory next steps
+
+Important: do not invent any information. If data is absent, indicate "Not mentioned".
+
+Here are the notes / transcript:
+[NOTES_OR_TRANSCRIPT]`}},
+
+{id:7,stages:["proposition"],type:"mail",
+fr:{title:"Mail post-démo + envoi devis",description:"Mail de suivi démo avec présentation des devis et conditions générales",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je viens de terminer une démonstration avec un prospect et je m'apprête à lui envoyer les devis par mail. Mon but est de rédiger un mail professionnel qui récapitule la démo, présente les devis et rappelle les conditions générales.
+
+Voici le contexte :
+
+- Contact : [NOM_CLIENT] ([ENTREPRISE])
+- Points forts de la démo / ce qui a le plus intéressé le client : [POINTS_FORTS]
+- Devis envoyés : [DETAILS_DEVIS]
+- Date de validité des devis : [DATE_VALIDITE]
+
+Rédige un mail qui :
+- Remercie brièvement pour la démo et récapitule les points clés qui ont retenu leur attention
+- Introduit les devis joints de manière valorisante
+- Rappelle les conditions générales suivantes de façon naturelle et non contractuelle :
+  * Les devis sont valides jusqu'au [DATE_VALIDITE] et peuvent être signés directement en ligne
+  * Pour les devis annuels et multiannuels, le client dispose de 21 jours pour procéder au paiement après signature
+  * Si un Success Pack est inclus, le délai d'assignation des consultants commence à partir de la réception du paiement
+- Reste concis et orienté vers l'action (200 mots maximum)`},
+en:{title:"Post-demo email + quotes",description:"Follow-up email after demo with quotes and general terms",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I have just completed a demonstration with a prospect and am about to send them the quotes by email. My goal is to write a professional email recapping the demo, presenting the quotes, and outlining the general terms.
+
+Here is the context:
+
+- Contact: [CLIENT_NAME] ([COMPANY])
+- Demo highlights / what interested the client most: [HIGHLIGHTS]
+- Quotes sent: [QUOTE_DETAILS]
+- Quote expiry date: [DATE_VALIDITE]
+
+Write an email that:
+- Briefly thanks them for the demo and recaps the key points that caught their attention
+- Introduces the attached quotes in a value-driven way
+- Naturally reminds them of the following general terms:
+  * Quotes are valid until [DATE_VALIDITE] and can be signed directly online
+  * For annual and multi-year quotes, the client has 21 days to proceed with payment after signing
+  * If a Success Pack is included, the consultant assignment period begins upon receipt of payment
+- Stays concise and action-oriented (200 words maximum)`}},
+
+{id:8,stages:["negociation"],type:"mail",
+fr:{title:"Réponse à une objection",description:"Réponse adaptée à l'objection exprimée par le prospect",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je suis en phase de négociation avec un prospect. Mon but est de formuler une réponse efficace et adaptée à l'objection qu'il m'a exprimée.
+
+Voici le contexte :
+
+- Contact : [NOM_CLIENT] ([ENTREPRISE])
+- Détails de notre offre : [DETAILS_OFFRE]
+- Objection exprimée : [OBJECTION]
+  (ex : "c'est trop cher", "on veut attendre", "notre IT n'est pas convaincu", "on regarde encore d'autres solutions")
+- Concurrent éventuellement mentionné : [CONCURRENT]
+
+Formule une réponse adaptée à l'objection qui :
+- Reconnaît l'objection sans la minimiser
+- Adopte le bon angle selon la situation :
+  * Prix → recadrer sur la valeur, le ROI et le coût de l'inaction, proposer des alternatives si pertinent (plan différent, Success Pack réduit)
+  * "On veut attendre" → créer une urgence douce, rappeler le coût du statu quo
+  * "Notre IT n'est pas convaincu" → proposer d'impliquer les équipes techniques, rassurer sur l'intégration et le support Odoo
+  * "On regarde d'autres solutions" → valoriser les différenciateurs Odoo sans dénigrer la concurrence
+- Maintient une posture confiante et garde la porte ouverte
+- Reste concis et actionnable`},
+en:{title:"Objection response",description:"Tailored response to a prospect's objection",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I am in the negotiation phase with a prospect. My goal is to formulate an effective response tailored to the objection they have raised.
+
+Here is the context:
+
+- Contact: [CLIENT_NAME] ([COMPANY])
+- Our offer details: [OFFER_DETAILS]
+- Objection expressed: [OBJECTION]
+  (e.g. "it's too expensive", "we want to wait", "our IT team isn't convinced", "we're still looking at other solutions")
+- Competitor mentioned (if any): [COMPETITOR]
+
+Formulate a response tailored to the objection that:
+- Acknowledges the objection without minimizing it
+- Adopts the right angle depending on the situation:
+  * Price → reframe around value, ROI and cost of inaction, propose alternatives if relevant (different plan, reduced Success Pack)
+  * "We want to wait" → create gentle urgency, remind them of the cost of the status quo
+  * "Our IT isn't convinced" → propose involving technical teams, reassure on Odoo integration and support
+  * "We're looking at other solutions" → highlight Odoo differentiators without disparaging competitors
+- Maintains a confident posture and keeps the door open
+- Stays concise and actionable`}},
+
+{id:10,stages:["qualified"],type:"preparation",
+fr:{title:"Préparation questions de qualification",description:"Questions spécifiques à poser selon le secteur du prospect",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je m'apprête à réaliser un rendez-vous de qualification avec un prospect. Mon but est d'identifier les questions spécifiques à poser selon leur secteur pour maximiser la qualité de la qualification.
+
+Secteur du prospect : [SECTEUR]
+
+Voici ce que je sais déjà sur eux :
+[INFOS_DISPONIBLES]
+
+Sur base du secteur, génère-moi :
+- Les 5 questions les plus importantes à poser spécifiquement pour ce secteur (au-delà des questions standards)
+- Les spécificités métier de ce secteur qui impactent généralement le choix des modules Odoo
+- Les points de vigilance typiques (réglementaire, technique, organisationnel) à avoir en tête
+
+Sois concis et actionnable.`},
+en:{title:"Qualification question prep",description:"Sector-specific questions to ask during the qualification",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I am about to conduct a qualification meeting with a prospect. My goal is to identify sector-specific questions to ask in order to maximize the quality of the qualification.
+
+Prospect's sector: [SECTOR]
+
+Here is what I already know about them:
+[AVAILABLE_INFO]
+
+Based on the sector, generate:
+- The 5 most important questions to ask specifically for this sector (beyond standard questions)
+- Business specificities of this sector that generally impact the choice of Odoo modules
+- Typical points of attention (regulatory, technical, organizational) to keep in mind
+
+Be concise and actionable.`}},
+
+{id:11,stages:["qualified"],type:"mail",
+fr:{title:"Mail infos manquantes post-qual",description:"Demander naturellement des infos oubliées après la qualification",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Je viens de terminer un rendez-vous de qualification mais il me manque certaines informations pour préparer la démonstration. Mon but est de contacter le prospect de façon naturelle pour récupérer ces infos.
+
+Voici le contexte :
+
+- Contact : [NOM_CLIENT] ([ENTREPRISE])
+- Informations manquantes : [INFOS_MANQUANTES]
+
+Rédige un mail court et naturel pour demander ces informations qui :
+- Reste chaleureux et contextualisé
+- Explique brièvement pourquoi ces infos sont utiles (pour personnaliser la démo)
+- Pose les questions de façon fluide, pas en liste froide
+- Soit très court (5-6 lignes maximum)`},
+en:{title:"Post-qual missing info email",description:"Naturally request information missed during qualification",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I have just completed a qualification meeting but am missing some information to prepare the demonstration. My goal is to contact the prospect naturally to retrieve this information.
+
+Here is the context:
+
+- Contact: [CLIENT_NAME] ([COMPANY])
+- Missing information: [MISSING_INFO]
+
+Write a short and natural email to request this information that:
+- Stays warm and contextualized
+- Briefly explains why this info is useful (to personalize the demo)
+- Asks the questions in a fluid way, not as a cold list
+- Is very short (5-6 lines maximum)`}},
+
+{id:12,stages:["proposition","negociation"],type:"mail",
+fr:{title:"Relance proposition non signée",description:"Relancer un prospect selon sa situation (silence, attente, expiration)",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. J'ai envoyé une proposition commerciale à un prospect qui n'a pas encore signé. Mon but est de relancer ce prospect de façon professionnelle et adaptée à sa situation.
+
+Voici le contexte :
+
+- Contact : [NOM_CLIENT] ([ENTREPRISE])
+- Date d'envoi des devis : [DATE_ENVOI]
+- Date de validité des devis : [DATE_VALIDITE]
+- Situation actuelle : [SITUATION]
+  (ex : "le client ne répond plus", "le client attend une validation interne", "le devis arrive à expiration dans X jours")
+
+Rédige un mail de relance adapté à la situation qui :
+- Est court et direct (3-5 phrases max)
+- Adopte le bon ton selon la situation (urgence douce si expiration proche, patient si validation interne en cours, neutre si silence)
+- Rappelle la valeur sans être insistant
+- Inclut une question fermée simple pour faciliter la réponse
+- Mentionne la date d'expiration du devis si pertinent`},
+en:{title:"Unsigned proposal follow-up",description:"Follow up with a prospect based on their situation",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. I have sent a commercial proposal to a prospect who has not yet signed. My goal is to follow up with this prospect in a professional and situation-appropriate manner.
+
+Here is the context:
+
+- Contact: [CLIENT_NAME] ([COMPANY])
+- Date quotes were sent: [SEND_DATE]
+- Quote expiry date: [DATE_VALIDITE]
+- Current situation: [SITUATION]
+  (e.g. "client is not responding", "client is waiting for internal approval", "quote expires in X days")
+
+Write a follow-up email tailored to the situation that:
+- Is short and direct (3-5 sentences max)
+- Adopts the right tone (gentle urgency if expiry is near, patient if internal approval is pending, neutral if silence)
+- Reminds them of the value without being pushy
+- Includes a simple closed question to make it easy to reply
+- Mentions the quote expiry date if relevant`}},
+
+{id:13,stages:["negociation"],type:"mail",
+fr:{title:"Mail de closing",description:"Pousser élégamment le prospect vers la signature",
+prompt:`Tu es mon assistant IA. Je suis Business Development Representative chez Odoo. Tous les éléments sont alignés avec le prospect et je souhaite les pousser élégamment vers la signature. Mon but est de rédiger un mail de closing professionnel et engageant.
+
+Voici le contexte :
+
+- Contact : [NOM_CLIENT] ([ENTREPRISE])
+- Plan retenu : [PLAN]
+- Date de validité des devis : [DATE_VALIDITE]
+- Éléments clés alignés / ce sur quoi on s'est mis d'accord : [ELEMENTS_ALIGNES]
+
+Rédige un mail de closing qui :
+- Résume brièvement les points clés sur lesquels on s'est alignés
+- Rappelle la valeur de la solution retenue pour leur contexte spécifique
+- Crée une urgence naturelle autour de la date de validité des devis sans être pressant
+- Invite à signer directement en ligne de façon claire et simple
+- Reste chaleureux, confiant et concis (150 mots maximum)`},
+en:{title:"Closing email",description:"Elegantly push the prospect towards signing",
+prompt:`You are my AI assistant. I am a Business Development Representative at Odoo. All elements are aligned with the prospect and I want to elegantly push them towards signing. My goal is to write a professional and engaging closing email.
+
+Here is the context:
+
+- Contact: [CLIENT_NAME] ([COMPANY])
+- Agreed plan: [PLAN]
+- Quote expiry date: [DATE_VALIDITE]
+- Key aligned elements / what we agreed on: [ALIGNED_ELEMENTS]
+
+Write a closing email that:
+- Briefly summarizes the key points we aligned on
+- Reminds them of the value of the chosen solution for their specific context
+- Creates natural urgency around the quote expiry date without being pushy
+- Clearly and simply invites them to sign directly online
+- Stays warm, confident and concise (150 words maximum)`}}
+];
+
+let S={lang:"fr",selStages:[],selTypes:[],tone:"neutral",search:"",expandedId:null,varValues:{},copiedId:null};
+function T(fr,en){return S.lang==="fr"?fr:en;}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function parseVars(t){return[...new Set([...t.matchAll(/\[([A-Z_ÉÀÂÔÙÎÈÊ]+)\]/g)].map(m=>m[1]))];}
+function formatDate(v){if(!v)return"";const d=new Date(v);if(isNaN(d))return v;return d.toLocaleDateString("fr-BE",{day:"2-digit",month:"2-digit",year:"numeric"});}
+function applyVars(t,v){let r=t;for(const[k,val]of Object.entries(v)){if(val){const display=DATE_VARS.has(k)?formatDate(val):val;r=r.split("["+k+"]").join(display);}}return r;}
+function getVL(k){return VL[k]?.[S.lang]||k.replace(/_/g," ").toLowerCase();}
+function setState(p){Object.assign(S,p);render();}
+function setLang(l){setState({lang:l});}
+function setTone(t){setState({tone:t});}
+function setSearch(v){setState({search:v});}
+function clearStages(){setState({selStages:[]});}
+function clearTypes(){setState({selTypes:[]});}
+function resetAll(){setState({selStages:[],selTypes:[],search:""});}
+function toggleStage(id){const p=S.selStages;setState({selStages:p.includes(id)?p.filter(x=>x!==id):[...p,id]});}
+function toggleType(id){const p=S.selTypes;setState({selTypes:p.includes(id)?p.filter(x=>x!==id):[...p,id]});}
+function toggleExpand(id){setState({expandedId:S.expandedId===id?null:id});}
+function setVar(pid,key,val){S.varValues={...S.varValues,[pid]:{...(S.varValues[pid]||{}),[key]:val}};const preview=document.getElementById("preview-"+pid);if(preview)preview.innerHTML=renderPreviewHTML(PROMPTS.find(p=>p.id===pid),S.varValues[pid]||{});const input=document.getElementById("var-"+pid+"-"+key);if(input)input.className="var-input"+(val?" filled":"");}
+function copyP(id){const p=PROMPTS.find(x=>x.id===id);const data=p[S.lang];const vals=S.varValues[id]||{};let text=applyVars(data.prompt,vals)+TS[S.lang][S.tone];navigator.clipboard.writeText(text).then(()=>{setState({copiedId:id});setTimeout(()=>setState({copiedId:null}),2100);}).catch(()=>{const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);setState({copiedId:id});setTimeout(()=>setState({copiedId:null}),2100);});}
+function renderPreviewHTML(p,vals){const text=p[S.lang].prompt;return text.split(/(\[[A-Z_ÉÀÂÔÙÎÈÊ]+\])/g).map(part=>{const m=part.match(/^\[([A-Z_ÉÀÂÔÙÎÈÊ]+)\]$/);if(m){const k=m[1];const v=vals[k];if(v){const display=DATE_VARS.has(k)?formatDate(v):v;return`<span class="var-filled">${esc(display)}</span>`;}return`<span class="var-unfilled">${esc(part)}</span>`;}return esc(part);}).join("");}
+function filtered(){return PROMPTS.filter(p=>{if(S.selStages.length&&!p.stages.some(s=>S.selStages.includes(s)))return false;if(S.selTypes.length&&!S.selTypes.includes(p.type))return false;if(S.search.trim()){const q=S.search.toLowerCase();const d=p[S.lang];if(!d.title.toLowerCase().includes(q)&&!d.description.toLowerCase().includes(q))return false;}return true;});}
+function render(){document.getElementById("app").innerHTML=buildHTML();}
+function buildHTML(){const f=filtered();const hasF=S.selStages.length||S.selTypes.length||S.search.trim();
+const stageBtns=STAGES.map(s=>{const a=S.selStages.includes(s.id);const c=SC[s.id];return`<button class="filter-btn" onclick="toggleStage('${s.id}')" style="border-color:${a?c.bd:"transparent"};background:${a?c.bg:"transparent"};color:${a?c.tx:"#7A7570"};font-weight:${a?700:500};"><div class="filter-dot" style="background:${a?c.tx:"#D1D5DB"};"></div>${s[S.lang]}</button>`;}).join("")+(S.selStages.length?`<button class="clear-btn" onclick="clearStages()">${T("Tout effacer","Clear all")}</button>`:"");
+const typeBtns=TYPES.map(tp=>{const a=S.selTypes.includes(tp.id);return`<button class="filter-btn" onclick="toggleType('${tp.id}')" style="border-color:${a?"#E5E7EB":"transparent"};background:${a?"#F9FAFB":"transparent"};color:${a?"#2E2B2A":"#7A7570"};font-weight:${a?700:500};">${tp.icon} ${tp[S.lang]}</button>`;}).join("")+(S.selTypes.length?`<button class="clear-btn" onclick="clearTypes()">${T("Tout effacer","Clear all")}</button>`:"");
+const toneBtns=TONES.map(tn=>{const a=S.tone===tn.id;return`<button class="filter-btn" onclick="setTone('${tn.id}')" style="border-color:${a?"#714B6750":"transparent"};background:${a?"#f3ecf0":"transparent"};color:${a?"#714B67":"#7A7570"};font-weight:${a?700:500};"><div style="width:14px;height:14px;border-radius:50%;border:2px solid ${a?"#714B67":"#D1D5DB"};background:${a?"#714B67":"transparent"};flex-shrink:0;"></div>${tn[S.lang]}</button>`;}).join("");
+const cards=f.length?f.map(p=>{const data=p[S.lang];const isExp=S.expandedId===p.id;const isCop=S.copiedId===p.id;const vars=parseVars(data.prompt);const vals=S.varValues[p.id]||{};const tp=TYPES.find(x=>x.id===p.type);const stageBadges=p.stages.map(s=>{const c=SC[s];const lb=STAGES.find(x=>x.id===s)?.[S.lang]||s;return`<span class="badge" style="background:${c.bg};color:${c.tx};border:1px solid ${c.bd};">${lb}</span>`;}).join("");
+let expHTML="";
+if(isExp){const varInputs=vars.map(k=>{const isL=LONG.has(k);const isD=DATE_VARS.has(k);const v=vals[k]||"";let inp;if(isD){inp=`<input id="var-${p.id}-${k}" type="date" class="var-input${v?" filled":""}" oninput="setVar(${p.id},'${k}',this.value)" value="${esc(v)}"/>`;}else if(isL){inp=`<textarea id="var-${p.id}-${k}" class="var-input${v?" filled":""}" rows="3" oninput="setVar(${p.id},'${k}',this.value)">${esc(v)}</textarea>`;}else{inp=`<input id="var-${p.id}-${k}" class="var-input${v?" filled":""}" type="text" oninput="setVar(${p.id},'${k}',this.value)" value="${esc(v)}" placeholder="[${k}]"/>`;}return`<div class="var-item${isL&&!isD?" full":""}"><label class="var-field-label">${isD?"📅 ":""}${getVL(k)}</label>${inp}</div>`;}).join("");
+const toneNote=S.tone!=="neutral"?`<div class="tone-notice">⚠️ ${T("Instruction de ton ajoutée à la copie","Tone instruction added on copy")} : <strong>${TONES.find(x=>x.id===S.tone)?.[S.lang]}</strong></div>`:"";
+expHTML=`<div class="card-body">${vars.length?`<div class="section-label" style="margin-bottom:10px;">${T("Variables","Variables")}</div><div class="vars-grid">${varInputs}</div>`:""}<div class="section-label">${T("Aperçu du prompt","Prompt preview")}</div><div class="prompt-preview" id="preview-${p.id}">${renderPreviewHTML(p,vals)}</div>${toneNote}</div>`;}
+return`<div class="card${isExp?" expanded":""}"><div class="card-header"><div class="card-top"><div class="card-info"><div class="badges"><span class="badge badge-type">${tp?tp.icon:""} ${tp?tp[S.lang]:""}</span>${stageBadges}</div><div class="card-title">${esc(data.title)}</div><div class="card-desc">${esc(data.description)}</div>${vars.length?`<div class="var-hint">🔧 ${vars.length} ${T("variable(s) à personnaliser","variable(s) to customize")}</div>`:""}</div><div class="card-actions">${vars.length?`<button class="btn-customize${isExp?" active":""}" onclick="toggleExpand(${p.id})">${isExp?"✕ ":"✏️ "}${T("Personnaliser","Customize")}</button>`:""}<button class="btn-copy${isCop?" copied":""}" onclick="copyP(${p.id})">${isCop?"✓ "+T("Copié !","Copied!"):"📋 "+T("Copier","Copy")}</button></div></div></div>${expHTML}</div>`;}).join(""):`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">${T("Aucun prompt trouvé","No prompts found")}</div><div class="empty-sub">${T("Ajustez vos filtres","Adjust your filters")}</div></div>`;
+return`<header class="header"><div class="logo-area"><div class="logo-icon">O</div><div><div class="logo-title">${T("Bibliothèque de Prompts","Prompt Library")}</div><div class="logo-sub">Odoo BDR · Powered by Gemini</div></div></div><div class="lang-toggle"><button class="lang-btn ${S.lang==="fr"?"active":"inactive"}" onclick="setLang('fr')">FR</button><button class="lang-btn ${S.lang==="en"?"active":"inactive"}" onclick="setLang('en')">EN</button></div></header><div class="layout"><aside class="sidebar"><div class="filter-section"><div class="filter-label">${T("Étape CRM","CRM Stage")}</div>${stageBtns}</div><div class="filter-section"><div class="filter-label">${T("Type d'activité","Activity Type")}</div>${typeBtns}</div><div class="filter-section"><div class="filter-label">${T("Ton de la réponse","Response tone")}</div>${toneBtns}<div class="tone-info">💡 ${T("Le ton s'ajoute automatiquement lors de la copie.","Tone is automatically added when copying.")}</div></div></aside><main class="main"><div class="search-wrap"><span class="search-icon">🔎</span><input class="search-input" type="text" placeholder="${T("Rechercher un prompt...","Search for a prompt...")}" value="${esc(S.search)}" oninput="setSearch(this.value)"/></div><div class="results-bar">${f.length} ${T("prompt(s)","prompt(s)")}${hasF?`<button class="reset-btn" onclick="resetAll()">${T("Réinitialiser","Reset")}</button>`:""}</div><div class="cards">${cards}</div></main></div>`;}
+render();
+</script>
+</body>
+</html>
